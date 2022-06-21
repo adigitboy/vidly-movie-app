@@ -4,15 +4,22 @@ const Joi = require('@hapi/joi');
 
 const mongoose = require('mongoose');
 
+router.use(express.json());
 
 
-const genresSchema = new mongoose.Schema({
-    id : Number,                                                     
+
+
+
+const Genres = mongoose.model('Genres',new mongoose.Schema({
+    id : {
+        type : Number,
+        required : true,
+    },                                                     
     name : String,                                                 
     category : String,                                                
-});
+}));
 
-const Genres = mongoose.model('Genres',genresSchema);
+
 
 async function createGenre(obj){
     const genre = new Genres({
@@ -24,9 +31,8 @@ async function createGenre(obj){
     return result;
 } 
 
-router.use(express.json());
 
-async function getAllCourse(){
+async function getAllGenre(){
     const genres = await Genres.find();
     return genres;
 }
@@ -34,7 +40,7 @@ async function getAllCourse(){
 router.get('/',(req,res)=>{
 
     async function getReq(){
-        const result = await getAllCourse();
+        const result = await getAllGenre();
         res.send(result);
     }
     getReq();
@@ -54,7 +60,7 @@ router.get('/:id',(req,res)=>{
 
 router.put('/:id',(req,res)=>{
     async function putGenre(obj){
-        const result = validateCourse(req.body);
+        const result = validateGenre(req.body);
         if(result.error){
             res.status(404).send(result.error.details[0].message);
             return;
@@ -74,7 +80,7 @@ router.put('/:id',(req,res)=>{
 });
 
 router.post('/',(req,res)=>{
-    const result = validateCourse(req.body);
+    const result = validateGenre(req.body);
     if(result.error){
         res.status(404).send(result.error.details[0].message);
         return;
@@ -94,7 +100,7 @@ router.delete('/:id',async(req,res)=>{
 
 });
 
-function validateCourse(genre){
+function validateGenre(genre){
     const schema = {
         id : Joi.number(),
         name : Joi.string().min(3).required(),

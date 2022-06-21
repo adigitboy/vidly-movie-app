@@ -1,14 +1,16 @@
 const express = require('express');
 const app = express();
-const router = require('./routes/genres');
-
+const genres = require('./routes/genres');
+const customers = require('./routes/customers');
 
 const mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/vidly').then(()=>console.log('Connected'));
 
 
-app.use('/api/genres',router);
+app.use('/api/genres',genres);
+
+app.use('/api/customers',customers);
 
 app.get('/',(req,res)=>{
     res.send('Hello there!,..');
