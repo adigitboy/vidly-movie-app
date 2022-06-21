@@ -4,7 +4,7 @@ const Joi = require('@hapi/joi');
 
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/vidly').then(()=>console.log('Connected'));
+
 
 const genresSchema = new mongoose.Schema({
     id : Number,                                                     
@@ -12,7 +12,7 @@ const genresSchema = new mongoose.Schema({
     category : String,                                                
 });
 
-const Genres = new mongoose.model('Genres',genresSchema);
+const Genres = mongoose.model('Genres',genresSchema);
 
 async function createGenre(obj){
     const genre = new Genres({
@@ -52,20 +52,26 @@ router.get('/:id',(req,res)=>{
     
 });
 
-// router.put('/:id',(req,res)=>{
-//     const genre = genres.find( c =>  c.id === parseInt(req.params.id) ); 
-//     if(!genre) res.status(404).send( " Genre Doesn't Exisit :( .." );
-
-//     const result = validateCourse(req.body);
-//     if(result.error){
-//         res.status(404).send(result.error.details[0].message);
-//         return;
-//     }
-    
-//     genre.name = req.body.name;
-//     res.send(genre);
-
-// });
+router.put('/:id',(req,res)=>{
+    async function putGenre(obj){
+        const result = validateCourse(req.body);
+        if(result.error){
+            res.status(404).send(result.error.details[0].message);
+            return;
+        } 
+        const id_ = parseInt(obj.id);
+        const oid = await Genres.find(); 
+       
+        const genre = await Genres.findByIdAndUpdate(oid[id_-1]._id,{$set :{
+            id : id_,
+            name : obj.name,
+            category : obj.category,
+        } },{new : true}); 
+        
+        res.send(genre);
+    }
+    putGenre(req.body);
+});
 
 router.post('/',(req,res)=>{
     const result = validateCourse(req.body);
@@ -80,15 +86,13 @@ router.post('/',(req,res)=>{
     postReq();
 });
 
-// router.delete('/:id',(req,res)=>{
-//     const genre = genres.find(c => c.id===parseInt(req.params.id));
-//     if(!genre) res.status(404).send('Genre not found :(..');
+router.delete('/:id',async(req,res)=>{
+    const oid = await Genres.find();
+    if(oid[parseInt(req.params.id)-1]==null) res.status(404).send('Genre not found :(..');
+    const genre = await Genres.findByIdAndRemove(oid[parseInt(req.params.id)-1]._id);
+    res.send(genre);
 
-//     genres.splice(genres.indexOf(genre),1);
-
-//     res.send(genres);
-
-// });
+});
 
 function validateCourse(genre){
     const schema = {
