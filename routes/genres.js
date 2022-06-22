@@ -1,25 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Joi = require('@hapi/joi');
-
 const mongoose = require('mongoose');
+const {Genres,validateGenre} = require('../models/genre');
 
 router.use(express.json());
-
-
-
-
-
-const Genres = mongoose.model('Genres',new mongoose.Schema({
-    id : {
-        type : Number,
-        required : true,
-    },                                                     
-    name : String,                                                 
-    category : String,                                                
-}));
-
-
 
 async function createGenre(obj){
     const genre = new Genres({
@@ -30,7 +14,6 @@ async function createGenre(obj){
     const result  = await genre.save();
     return result;
 } 
-
 
 async function getAllGenre(){
     const genres = await Genres.find();
@@ -100,13 +83,5 @@ router.delete('/:id',async(req,res)=>{
 
 });
 
-function validateGenre(genre){
-    const schema = {
-        id : Joi.number(),
-        name : Joi.string().min(3).required(),
-        category : Joi.string(),
-    };
-    return Joi.validate(genre,schema);
-}
 
 module.exports = router;

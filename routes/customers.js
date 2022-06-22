@@ -1,23 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Joi = require('@hapi/joi');
-
 const mongoose = require('mongoose');
+const {Customers,validateCustomer} = require('../models/customer');
 
 router.use(express.json());
-
-
-const Customers = mongoose.model('Customers',new mongoose.Schema({
-    id : Number,
-    name : String,
-    isGold :{ 
-        default : false,
-        type : Boolean,
-    },
-    phone : String
-
-}));
-
 
 
 async function createcustomer(obj){
@@ -100,15 +86,5 @@ router.delete('/:id',async(req,res)=>{
     res.send(customer);
 
 });
-
-function validateCustomer(customer){
-    const schema = {
-        id : Joi.number(),
-        name : Joi.string().min(3).required(),
-        phone : Joi.string().min(3).required(),
-        isGold : Joi.string(),
-    };
-    return Joi.validate(customer,schema);
-}
 
 module.exports = router;
